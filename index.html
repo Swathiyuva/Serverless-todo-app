@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to ToDo App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #d299c2, #fef9d7);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .container {
+      text-align: center;
+      background: white;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      margin-bottom: 40px;
+      width: 100%;
+      max-width: 800px;
+      position: relative;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      background: #6a0dad;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #5a0099;
+    }
+
+    .logout-btn {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      background: #6a0dad;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+        }
+
+    .user-list {
+      width: 90%;
+      max-width: 700px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #6a0dad;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    td {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Welcome to Serverless ToDo App</h1>
+    <button onclick="location.href='register.html'">Register</button>
+    <button onclick="location.href='login.html'">Login</button>
+    <button class="logout-btn" onclick="logoutUser()">Logout</button>
+  </div>
+
+  <div class="user-list">
+    <h2>📋 Registered Users</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody id="userBody">
+        <tr><td colspan="2">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const API = 'http://localhost:5000';
+
+    
+
+    // 🧾 Fetch registered users
+    fetch(`${API}/users`)
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP status ' + res.status);
+        return res.json();
+      })
+      .then(users => {
+        const tbody = document.getElementById('userBody');
+        tbody.innerHTML = '';
+
+        if (!users.length) {
+          tbody.innerHTML = `<tr><td colspan="2">No users found.</td></tr>`;
+        } else {
+          users.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${user.username}</td>
+              <td>${user.email || '-'}</td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+      })
+      .catch(err => {
+        console.error("❌ Error fetching users:", err);
+        const tbody = document.getElementById('userBody');
+        tbody.innerHTML = `<tr><td colspan="2">Failed to load users.</td></tr>`;
+      });
+
+    // 🔓 Logout
+    function logoutUser() {
+      localStorage.removeItem('username');
+      alert("You have been logged out.");
+      window.location.href = 'login.html';
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Todo List</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 50px;
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 400px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input {
+      width: calc(100% - 100px);
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px;
+      margin-left: 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    li span {
+      flex-grow: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>My Tasks</h2>
+    <div style="display:flex; margin-bottom: 20px;">
+      <input id="task" placeholder="New Task" />
+      <button onclick="addTodo()">Add</button>
+    </div>
+    <ul id="list"></ul>
+  </div>
+  
+  <script>
+    const API = 'http://localhost:5000';
+    const username = localStorage.getItem('username');
+    if (!username) {
+      alert('Please login first!');
+      window.location.href = 'login.html';
+    }
+
+    function addTodo() {
+      const task = document.getElementById('task').value;
+      fetch(`${API}/todos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, task })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          document.getElementById('task').value = '';
+          loadTodos();
+        } else alert('Add failed');
+      })
+      .catch(err => alert('Error: ' + err));
+    }
+
+    function deleteTodo(id) {
+      fetch(`${API}/todos/${id}`, { method: 'DELETE' })
+        .then(() => loadTodos())
+        .catch(err => alert('Delete error: ' + err));
+    }
+
+    function toggleTodo(id) {
+      fetch(`${API}/todos/${id}/toggle`, { method: 'PUT' })
+        .then(() => loadTodos())
+        .catch(err => alert('Toggle error: ' + err));
+    }
+
+    function editTodo(todoId, oldTask) {
+      const newTask = prompt("Update task:", oldTask);
+      if (newTask && newTask !== oldTask) {
+        fetch(`${API}/todos/${todoId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ task: newTask })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            loadTodos();
+          } else {
+            alert('Update failed');
+          }
+        })
+        .catch(err => alert('Error updating task: ' + err));
+      }
+    }
+
+    function loadTodos() {
+      fetch(`${API}/todos?username=${username}`)
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById('list');
+          list.innerHTML = '';
+          data.forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+              <span style="text-decoration:${item.status === 'completed' ? 'line-through' : 'none'}">
+                ${item.task}
+              </span>
+             
+              <button onclick="toggleTodo('${item.todoId}')">Completed</button>
+              <button onclick="deleteTodo('${item.todoId}')">Delete</button>
+              <button onclick="editTodo('${item.todoId}', '${item.task}')">Edit</button>
+            `;
+            list.appendChild(li);
+          });
+        })
+        .catch(err => alert('Load error: ' + err));
+    }
+    
+    loadTodos();
+  </script>
+</body>
+</html>
+ <!-- <button onclick="toggleTodo('${item.todoId}')">✔</button>
+              <button onclick="deleteTodo('${item.todoId}')">🗑</button>
+              <button onclick="editTodo('${item.todoId}', '${item.task}')">✏️</button> -->

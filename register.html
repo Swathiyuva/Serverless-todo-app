@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register Page</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .wrapper {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 10px;
+      width: 350px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .wrapper h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .input-box {
+      margin-bottom: 15px;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background: #6a0dad;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #5a0099;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .login-link a {
+      color: #6a0dad;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    #result {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <h2>Register</h2>
+    <form id="registerForm">
+      <div class="input-box">
+        <input type="text" id="username" placeholder="Username" required>
+      </div>
+      <div class="input-box">
+        <input type="email" id="email" placeholder="Email" required>
+      </div>
+      <div class="input-box">
+        <input type="password" id="password" placeholder="Password" required>
+      </div>
+      <button type="submit" class="btn">Register</button>
+      <div class="login-link">
+        Already a member? <a href="login.html">Login Now</a>
+      </div>
+      <p id="result"></p>
+    </form>
+  </div>
+
+  <script>
+    const API = "http://localhost:5000";
+
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      fetch(`${API}/register_user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('result').innerText = data.message;
+        if (data.status === 'success') {
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1500);
+        }
+      })
+      .catch(error => {
+        document.getElementById('result').innerText = 'Error registering.';
+        console.error('Error:', error);
+      });
+    });
+  </script>
+
+</body>
+</html>

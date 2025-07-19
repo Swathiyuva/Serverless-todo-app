@@ -1,0 +1,39 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>Forgot Password</title>
+</head>
+<body>
+  <h2>Reset Your Password</h2>
+  <input id="email" type="email" placeholder="Enter your email" required />
+
+  <button onclick="sendReset()">Send Reset Link</button>
+
+ <script>
+  function sendReset() {
+    const email = document.getElementById('email').value;
+
+    fetch("http://192.168.1.15:5000/reset-request", {
+
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })  // ✅ send 'email' only
+    })
+    .then(res => {
+      console.log("Status:", res.status);
+      return res.json();
+    })
+    .then(data => {
+      console.log("✅ Response:", data);
+      alert(data.message);
+    })
+    .catch(err => {
+      console.error("❌ Error:", err);
+      alert("Failed: " + err.message);
+    });
+  }
+</script>
+
+</body>
+</html>
+ -->
